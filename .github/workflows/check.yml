@@ -14,7 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-
+          - model: "SM-A536E"
+            csc: "TPA"
+            omc: "TPA"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -58,6 +60,7 @@ jobs:
       - name: Fetch firmware
         if: env.need_update == 1
         run: |
+          imei="357518816398424"
           samfirm -m ${{ matrix.model }} -r ${{ matrix.csc }} -i $imei
 
       - name: Get path of files
