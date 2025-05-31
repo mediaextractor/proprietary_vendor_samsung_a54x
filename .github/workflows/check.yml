@@ -131,8 +131,20 @@ jobs:
           rm super.img
           [[ -e vendor.img ]] && zip ${{ env.latest_shortversion }}_vendor.zip vendor.img
           [[ -e vendor_dlkm.img ]] && zip ${{ env.latest_shortversion }}_vendor_dlkm.zip vendor_dlkm.img
-          [[ -e vendor.img ]] && rm vendor.img
           [[ -e vendor_dlkm.img ]] && rm vendor_dlkm.img
+
+      - name: Get tee blobs
+        if: env.need_update == 1
+        run: |
+           mkdir -p vendor/mount vendor/tee
+           sudo mount vendor.img vendor/mount
+           cp -rfa vendor/mount/tee vendor/tee
+           cd vendor/tee
+           zip -rq0 --store ${{ env.latest_shortversion }}_tee.zip .
+           mv -f ${{ env.latest_shortversion }}_tee.zip ../../
+           cd ../../
+           sudo umount vendor/mount
+           rm -rf vendor*
 
       - name: Update current version
         if: env.need_update == 1
@@ -170,3 +182,5 @@ jobs:
             ${{ env.latest_shortversion }}_patched_vbmeta.tar
             ${{ env.latest_shortversion }}_vendor.zip
             ${{ env.latest_shortversion }}_vendor_dlkm.zip
+            ${{ env.latest_shortversion }}_tee.zip
+
