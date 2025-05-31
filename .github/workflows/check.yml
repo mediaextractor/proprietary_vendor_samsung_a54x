@@ -127,7 +127,7 @@ jobs:
           simg2img super.img super_raw.img
           rm super.img
           mv super_raw.img super.img
-          python3 tools/bin/lpunpack.py -p vendor,vendor_dlkm super.img .
+          ./bin/lpunpack -p vendor super.img .
           rm super.img
           [[ -e vendor.img ]] && zip ${{ env.latest_shortversion }}_vendor.zip vendor.img
           [[ -e vendor_dlkm.img ]] && zip ${{ env.latest_shortversion }}_vendor_dlkm.zip vendor_dlkm.img
