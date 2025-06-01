@@ -141,7 +141,7 @@ jobs:
            sudo mount vendor.img vendor/mount
            cp -rfa vendor/mount/tee vendor/tee
            cd vendor/tee
-           zip -rq0 --store ${{ env.latest_shortversion }}_tee.zip .
+           zip -r0 --store ${{ env.latest_shortversion }}_tee.zip .
            mv -f ${{ env.latest_shortversion }}_tee.zip ../../
            cd ../../
            sudo umount vendor/mount
