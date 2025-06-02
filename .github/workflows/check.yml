@@ -164,7 +164,7 @@ jobs:
           git pull origin ${{github.ref}} --ff-only
           echo ${{ env.latest_version }} > current.${{ matrix.model }}_${{ matrix.omc }}
           git add current.${{ matrix.model }}_${{ matrix.omc }}
-          git commit -m "${{ matrix.model }}: ${{ env.latest_version }}"
+          git commit -m "a53x: ${{ matrix.model }}: ${{ env.latest_version }}"
           git tag "${{ env.latest_shortversion }}_${{ matrix.omc }}"
 
       - name: Push changes to repo
