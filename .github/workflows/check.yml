@@ -14,6 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - model: "SM-A536B"
+            csc: "EUX"
+            omc: "EUX"
+            imei: "350498050045386"
           - model: "SM-A536E"
             csc: "TPA"
             omc: "TPA"
