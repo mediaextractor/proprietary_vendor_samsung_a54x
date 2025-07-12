@@ -17,6 +17,8 @@ jobs:
           - model: "SM-A536E"
             csc: "TPA"
             omc: "TPA"
+            imei: "357518816398424"
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -61,8 +63,7 @@ jobs:
       - name: Fetch firmware
         if: env.need_update == 1
         run: |
-          imei="357518816398424"
-          samfirm -m ${{ matrix.model }} -r ${{ matrix.csc }} -i $imei
+          samfirm -m ${{ matrix.model }} -r ${{ matrix.csc }} -i ${{ matrix.imei }}
 
       - name: Get path of files
         if: env.need_update == 1
@@ -85,14 +86,6 @@ jobs:
           echo PDA version: $version_short > versions.txt
           echo CSC version: $version_csc >> versions.txt
           echo Modem version: $version_modem >> versions.txt
-
-      - name: Cleanup space
-        if: env.need_update == 1
-        run: |
-          sudo apt-get remove --purge -y "php*" "dotnet*" "mysql*" "nodejs*" "clang*" "google*"
-          sudo apt-get autoremove -y
-          sudo apt-get clean
-          sudo rm -rf /usr/local
 
       - name: Extract kernel images
         if: env.need_update == 1
