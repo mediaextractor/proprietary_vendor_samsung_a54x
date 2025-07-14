@@ -94,7 +94,7 @@ jobs:
       - name: Extract kernel images
         if: env.need_update == 1
         env:
-          FILES: boot.img.lz4 dtbo.img.lz4 init_boot.img.lz4 vbmeta.img.lz4 vendor_boot.img.lz4
+          FILES: boot.img.lz4 dtbo.img.lz4 vbmeta.img.lz4 vendor_boot.img.lz4
         run: |
           for file in $FILES; do tar xvf ${{ env.ap_tar }} ${file}; done
           tar cvf ${{ env.latest_shortversion }}_kernel.tar *.lz4
