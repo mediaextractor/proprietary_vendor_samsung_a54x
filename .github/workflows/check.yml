@@ -166,9 +166,9 @@ jobs:
                echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
            cd ../firmware
-           blobs="APDV_AUDIO_SLSI.bin AP_AUDIO_SLSI.bin NPU.bin calliope_sram.bin mfc_fw.bin os.checked.bin vts.bin"
-           for b in $blobs; do
-               echo "vendor/firmware/$b:vendor/firmware/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           find . -type f \( -name "APDV_AUDIO_SLSI.bin" -o -name "AP_AUDIO_SLSI.bin" -o -name "NPU.bin" -o -name "calliope_sram.bin" -o -name "mfc_fw.bin" -o -name "os.checked.bin" -o -name "vts.bin" \) \
+           | sed 's|^\./||' | sort | while read -r b; do
+               echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
       - name: Unmount vendor
