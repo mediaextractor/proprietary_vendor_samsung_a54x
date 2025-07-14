@@ -14,6 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - model: "SM-A5360"
+            csc: "CHC"
+            omc: "CHC"
+            imei: "353418791234567"
           - model: "SM-A536B"
             csc: "EUX"
             omc: "EUX"
