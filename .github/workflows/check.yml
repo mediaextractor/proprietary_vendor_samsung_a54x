@@ -317,6 +317,8 @@ jobs:
                mv "vendor/firmware/$b" "vendor/firmware/${{ matrix.model }}/$b"
            done
            generate_file_contexts "vendor/firmware/${{ matrix.model }}" "u:object_r:vendor_fw_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           echo "/vendor/firmware/${{ matrix.model }}/NPU\.bin u:object_r:vendor_npu_firmware_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           echo "/vendor/firmware/${{ matrix.model }}/os\.checked\.bin u:object_r:vendor_fw_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
            generate_file_contexts "vendor/tee/${{ matrix.model }}" "u:object_r:tee_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
 
            print_entry_fs() {
@@ -344,6 +346,8 @@ jobs:
            }
 
            generate_entries "vendor/firmware/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+           echo "vendor/firmware/${{ matrix.model }}/NPU.bin 0 0 644 capabilities=0x0" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+           echo "vendor/firmware/${{ matrix.model }}/os.checked.bin 0 0 644 capabilities=0x0" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
            generate_entries "vendor/tee/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
 
       - name: Unmount vendor
