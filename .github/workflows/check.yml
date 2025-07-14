@@ -91,6 +91,14 @@ jobs:
           echo CSC version: $version_csc >> versions.txt
           echo Modem version: $version_modem >> versions.txt
 
+      - name: Cleanup space
+        if: env.need_update == 1
+        run: |
+          sudo apt-get remove --purge -y "php*" "dotnet*" "mysql*" "nodejs*" "clang*" "google*"
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          sudo rm -rf /usr/local
+
       - name: Extract kernel images
         if: env.need_update == 1
         env:
