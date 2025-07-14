@@ -220,6 +220,8 @@ jobs:
                mv $i ${i}_${{ matrix.model }}
            done
 
+           rm -f "vbmeta.img"
+
            zip -r0 --store "../${{ env.latest_shortversion }}_BL_CP-los.zip" .
 
            [ -f "proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
