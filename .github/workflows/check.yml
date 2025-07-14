@@ -225,9 +225,18 @@ jobs:
            zip -r0 --store "../${{ env.latest_shortversion }}_BL_CP-los.zip" .
 
            [ -f "proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
-           echo "${{ env.latest_shortversion }}" >> "version_${{ matrix.model }}"
 
-           sha1sum * | awk '{print $2 "|" $1}' >> "../proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
+           {
+               echo "# Firmware for model ${{ matrix.model }} - from Samsung package version ${{ env.latest_shortversion }}"
+               sha1sum * | awk '{print $2 "|" $1}'
+               echo ""
+           } >> "../proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
+
+           echo "${{ env.latest_shortversion }}" >> "version_${{ matrix.model }}"
+           {
+               echo "# File containing the supported models, one per line"
+               sha1sum "version_${{ matrix.model }}" | awk '{print $2 "|" $1}'
+           } >> "../proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
 
       - name: Generate file_context and fs_config for TEEgris firmware
         if: env.need_update == 1
