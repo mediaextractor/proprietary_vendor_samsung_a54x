@@ -183,15 +183,28 @@ jobs:
         if: env.need_update == 1
         run: |
            [ -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           cd vendor/tee
-           find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           done
-
-           cd ../firmware
-           fw_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "NPU.bin" "calliope_sram.bin" "mfc_fw.bin" "os.checked.bin" "vts.bin" )
+           cd vendor/firmware
+           audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts.bin" )
            sudo grep -q "m34" "../mount/build.prop" && \
-               fw_blobs=( "NPU.bin" "calliope_sram.bin" "mfc_fw.bin" "os.checked.bin" "vts.bin" )
+               audio_blobs=( "calliope_sram.bin" "vts.bin" )
+
+           fw_blobs=( "NPU.bin"  "mfc_fw.bin" "os.checked.bin" )
+
+           find_cmd=(find . \( )
+           for i in "${!audio_blobs[@]}"; do
+               if [ $i -ne 0 ]; then
+                   find_cmd+=( -o )
+               fi
+               find_cmd+=( -name "${audio_blobs[i]}" )
+           done
+           find_cmd+=( \) -type f )
+
+           echo "# Audio Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
+                echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+                >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           done
+           echo ""
 
            find_cmd=(find . \( )
            for i in "${!fw_blobs[@]}"; do
@@ -202,10 +215,19 @@ jobs:
            done
            find_cmd+=( \) -type f )
 
+           echo "# Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
                 echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
                 >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
+           echo ""
+
+           cd ../tee
+           echo "# TEEgris Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           find . -type f | sed 's|^\./||' | sort | while read -r b; do
+               echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           done
+           echo ""
 
       - name: Generate proprietary-firmware.txt
         if: env.need_update == 1
