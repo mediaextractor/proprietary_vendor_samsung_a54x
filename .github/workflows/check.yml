@@ -287,5 +287,5 @@ jobs:
             ${{ env.latest_shortversion }}_vendor.zip
             ${{ env.latest_shortversion }}_tee.zip
             ${{ env.latest_shortversion }}_firmware.zip
-            ${{ env.latest_shortversion }}_BL_CP-los.tar
+            ${{ env.latest_shortversion }}_BL_CP-los.zip
 
