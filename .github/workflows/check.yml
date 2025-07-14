@@ -203,6 +203,8 @@ jobs:
           echo ${{ env.latest_version }} > current.${{ matrix.model }}_${{ matrix.omc }}
           git add current.${{ matrix.model }}_${{ matrix.omc }}
           git add proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}
+          git add file_context/file.${{ matrix.model }}_${{ matrix.omc }}
+          git add fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}
           git commit -m "a53x: ${{ matrix.model }}: ${{ env.latest_version }}"
           git tag "${{ env.latest_shortversion }}_${{ matrix.omc }}"
 
