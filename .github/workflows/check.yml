@@ -170,20 +170,20 @@ jobs:
         run: |
            mkdir -p vendor/mount vendor/tee
            sudo mount vendor.img vendor/mount
-           cp -rfa vendor/mount/tee* vendor/tee
-           cd vendor/tee
-           zip -r0 --store ${{ env.latest_shortversion }}_tee.zip .
-           mv -f ${{ env.latest_shortversion }}_tee.zip ../../
+           cp -rfa vendor/mount/tee vendor
+           cd vendor
+           zip -r0 --store ${{ env.latest_shortversion }}_tee.zip "tee"
+           mv -f ${{ env.latest_shortversion }}_tee.zip ../
            
       - name: Get firmware blobs
         if: env.need_update == 1
         run: |
            mkdir -p vendor/firmware 
-           cp -rfa vendor/mount/firmware* vendor/firmware
-           cd vendor/firmware
-           zip -r0 --store ${{ env.latest_shortversion }}_firmware.zip .
-           mv -f ${{ env.latest_shortversion }}_firmware.zip ../../
-           cd ../../
+           cp -rfa vendor/mount/firmware vendor
+           cd vendor
+           zip -r0 --store ${{ env.latest_shortversion }}_firmware.zip "firmware"
+           mv -f ${{ env.latest_shortversion }}_firmware.zip ../
+           cd ../
 
       - name: Generate proprietary-files.txt
         if: env.need_update == 1
@@ -209,7 +209,7 @@ jobs:
            find_cmd+=( \) -type f )
 
            "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
-                echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+                echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
                 >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
