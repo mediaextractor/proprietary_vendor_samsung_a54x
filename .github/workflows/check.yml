@@ -78,12 +78,6 @@ jobs:
         with:
           node-version: 'latest'
 
-      - name: Set up Python 3
-        if: env.need_update == 1
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
       - name: Install dependencies
         if: env.need_update == 1
         run: |
