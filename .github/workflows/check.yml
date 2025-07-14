@@ -191,21 +191,26 @@ jobs:
            [ -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            cd vendor/tee
            find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+               echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
            cd ../firmware
            fw_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "NPU.bin" "calliope_sram.bin" "mfc_fw.bin" "os.checked.bin" "vts.bin" )
-           grep -q "m34" "../mount/build.prop" && \
+           sudo grep -q "m34" "../mount/build.prop" && \
                fw_blobs=( "NPU.bin" "calliope_sram.bin" "mfc_fw.bin" "os.checked.bin" "vts.bin" )
-           find_cmd=(find . -type f)
-           for blob in "${fw_blobs[@]}"; do
-               find_cmd+=(-o -name "$blob")
+
+           find_cmd=(find . \( )
+           for i in "${!fw_blobs[@]}"; do
+               if [ $i -ne 0 ]; then
+                   find_cmd+=( -o )
+               fi
+               find_cmd+=( -name "${fw_blobs[i]}" )
            done
-           find_cmd[3]='-name'
+           find_cmd+=( \) -type f )
+
            "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
-               >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+                echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+                >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
       - name: Generate file_context and fs_config for TEEgris firmware
@@ -215,10 +220,10 @@ jobs:
            [ -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
            cd vendor/tee
            find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "/vendor/tee/SM-${{ matrix.model }}/$b u:object_r:tee_file:s0" >> "../../file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+               echo "/vendor/tee/${{ matrix.model }}/$b u:object_r:tee_file:s0" >> "../../file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
            done
            find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/SM-${{ matrix.model }}/$b 0 0 644 capabilities=0x0" >> "../../fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+               echo "vendor/tee/${{ matrix.model }}/$b 0 0 644 capabilities=0x0" >> "../../fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
       - name: Unmount vendor
