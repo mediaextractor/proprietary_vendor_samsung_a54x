@@ -15,8 +15,8 @@ jobs:
       matrix:
         include:
           - model: "SM-A2560"
-            csc: "CHC"
-            omc: "CHC"
+            csc: "TGY"
+            omc: "TGY"
             imei: "359681860424922"
           - model: "SM-A256B"
             csc: "EUX"
