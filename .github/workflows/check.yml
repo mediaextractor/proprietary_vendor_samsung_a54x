@@ -175,6 +175,19 @@ jobs:
                echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
+      - name: Generate file_context and fs_config for TEEgris firmware
+        if: env.need_update == 1
+        run: |
+           [ -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           [ -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+           cd vendor/tee
+           find . -type f | sed 's|^\./||' | sort | while read -r b; do
+               echo "/vendor/tee/SM-${{ matrix.model }}/$b u:object_r:tee_file:s0" >> "../../file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           done
+           find . -type f | sed 's|^\./||' | sort | while read -r b; do
+               echo "vendor/tee/SM-${{ matrix.model }}/$b 0 0 644 capabilities=0x0" >> "../../fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+           done
+
       - name: Unmount vendor
         if: env.need_update == 1
         run: |
