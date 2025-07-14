@@ -212,7 +212,7 @@ jobs:
                 echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
                 >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
-           echo ""
+           echo "" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
 
            find_cmd=(find . \( )
            for i in "${!fw_blobs[@]}"; do
@@ -228,14 +228,13 @@ jobs:
                 echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
                 >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
-           echo ""
+           echo "" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
 
            cd ../tee
            echo "# TEEgris Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            find . -type f | sed 's|^\./||' | sort | while read -r b; do
                echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
-           echo ""
 
       - name: Generate proprietary-firmware.txt
         if: env.need_update == 1
@@ -274,8 +273,9 @@ jobs:
            [ -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
            [ -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
            mkdir -p "vendor/firmware/${{ matrix.model }}"
-           mkdir -p "vendor/tee/${{ matrix.model }}"
-           mv -f "vendor/firmware/"* "vendor/tee/${{ matrix.model }}"
+           mv vendor/tee vendor/tee_old
+           mkdir -p vendor/tee
+           mv vendor/tee_old/ vendor/tee/${{ matrix.model }}
            print_entry_file() {
                local path="$1"
                local label="$2"
@@ -283,23 +283,28 @@ jobs:
            }
 
            generate_file_contexts() {
-               local base="$1"
-               local default_label="$2"
-               declare -A custom_labels=(
-                   ["NPU.bin"]="u:object_r:vendor_npu_firmware_file:s0"
-               )
-               find "$base" -type f -o -type d | sort | while read -r fullpath; do
-               relpath="${fullpath#$base/}"
-               [ -z "$relpath" ] && continue
-               context_path="/vendor/${base#vendor/}/$(printf "%s" "$relpath" | sed 's/\./\\./g')"
-               if [[ -n "${custom_labels[$relpath]}" ]]; then
-                   label="${custom_labels[$relpath]}"
-               else
-                   label="$default_label"
-               fi
-               print_entry_file "$context_path" "$label"
+                   local base="$1"
+                   local default_label="$2"
+                   declare -A custom_labels=(
+                       ["NPU.bin"]="u:object_r:vendor_npu_firmware_file:s0"
+                   )
+                   local base_context_path="/vendor/${base#vendor/}"
+                   print_entry_file "$base_context_path" "$default_label"
+                   find "$base" -type f -o -type d | sort | while read -r fullpath; do
+                   if [[ "$fullpath" == "$base" ]]; then
+                       continue
+                   fi
+                   relpath="${fullpath#$base/}"
+                   context_path="/vendor/${base#vendor/}/$(printf "%s" "$relpath" | sed 's/\./\\./g')"
+                   if [[ -n "${custom_labels[$relpath]}" ]]; then
+                       label="${custom_labels[$relpath]}"
+                   else
+                       label="$default_label"
+                   fi
+                   print_entry_file "$context_path" "$label"
                done
            }
+
            audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts.bin" )
            sudo grep -q "m34" "vendor/mount/build.prop" && \
                audio_blobs=( "calliope_sram.bin" "vts.bin" )
@@ -307,7 +312,7 @@ jobs:
            for b in "${audio_blobs[@]}"; do
                mv "vendor/firmware/$b" "vendor/firmware/${{ matrix.model }}/$b"
            done
-           generate_file_contexts "vendor/firmware/${{ matrix.model }}" "u:object_r:tee_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           generate_file_contexts "vendor/firmware/${{ matrix.model }}" "u:object_r:vendor_fw_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
            generate_file_contexts "vendor/tee/${{ matrix.model }}" "u:object_r:tee_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
 
            print_entry_fs() {
@@ -321,20 +326,21 @@ jobs:
                local base="$1"
                local gid_dir="2000"
                local gid_file="0"
+               print_entry_fs "$base" "$gid_dir" "755"
                find "$base" -printf '%P\n' | sort | while read -r relpath; do
+                   [ -z "$relpath" ] && continue
                    fullpath="$base/$relpath"
                    outpath="${fullpath#./}"
-                   [ -z "$relpath" ] && continue
                    if [ -d "$fullpath" ]; then
                        print_entry_fs "$outpath" "$gid_dir" "755"
-                       elif [ -f "$fullpath" ]; then
+                   elif [ -f "$fullpath" ]; then
                        print_entry_fs "$outpath" "$gid_file" "644"
                    fi
                done
            }
 
            generate_entries "vendor/firmware/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           generate_entries "vendor/tee" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+           generate_entries "vendor/tee/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
 
       - name: Unmount vendor
         if: env.need_update == 1
