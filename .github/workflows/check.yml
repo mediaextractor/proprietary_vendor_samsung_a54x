@@ -155,7 +155,7 @@ jobs:
           simg2img super.img super_raw.img
           rm super.img
           mv super_raw.img super.img
-          ./bin/lpunpack -p vendor super.img .
+          ./tools/bin/lpunpack -p vendor super.img .
           rm super.img
           [[ -e vendor.img ]] && zip ${{ env.latest_shortversion }}_vendor.zip vendor.img
 
