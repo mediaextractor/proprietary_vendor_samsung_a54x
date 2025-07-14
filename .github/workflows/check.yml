@@ -150,6 +150,24 @@ jobs:
            zip -r0 --store ${{ env.latest_shortversion }}_firmware.zip .
            mv -f ${{ env.latest_shortversion }}_firmware.zip ../../
            cd ../../
+
+      - name: Generate proprietary-files.txt
+        if: env.need_update == 1
+        run: |
+           [ -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           cd vendor/tee
+           find . -type f | sed 's|^\./||' | sort | while read -r b; do
+               echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           done
+           cd ../firmware
+           blobs="APDV_AUDIO_SLSI.bin AP_AUDIO_SLSI.bin NPU.bin calliope_sram.bin mfc_fw.bin os.checked.bin vts.bin"
+           for b in $blobs; do
+               echo "vendor/firmware/$b:vendor/firmware/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           done
+
+      - name: Unmount vendor
+        if: env.need_update == 1
+        run: |
            sudo umount vendor/mount
            rm -rf vendor*
 
@@ -161,6 +179,7 @@ jobs:
           git pull origin ${{github.ref}} --ff-only
           echo ${{ env.latest_version }} > current.${{ matrix.model }}_${{ matrix.omc }}
           git add current.${{ matrix.model }}_${{ matrix.omc }}
+          git add proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}
           git commit -m "a53x: ${{ matrix.model }}: ${{ env.latest_version }}"
           git tag "${{ env.latest_shortversion }}_${{ matrix.omc }}"
 
