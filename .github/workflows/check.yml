@@ -265,13 +265,68 @@ jobs:
         run: |
            [ -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
            [ -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           cd vendor/tee
-           find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "/vendor/tee/${{ matrix.model }}/$b u:object_r:tee_file:s0" >> "../../file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           mkdir -p "vendor/firmware/${{ matrix.model }}"
+           mkdir -p "vendor/tee/${{ matrix.model }}"
+           mv -f "vendor/firmware/"* "vendor/tee/${{ matrix.model }}"
+           print_entry_file() {
+               local path="$1"
+               local label="$2"
+               echo "$path $label"
+           }
+
+           generate_file_contexts() {
+               local base="$1"
+               local default_label="$2"
+               declare -A custom_labels=(
+                   ["NPU.bin"]="u:object_r:vendor_npu_firmware_file:s0"
+               )
+               find "$base" -type f -o -type d | sort | while read -r fullpath; do
+               relpath="${fullpath#$base/}"
+               [ -z "$relpath" ] && continue
+               context_path="/vendor/${base#vendor/}/$(printf "%s" "$relpath" | sed 's/\./\\./g')"
+               if [[ -n "${custom_labels[$relpath]}" ]]; then
+                   label="${custom_labels[$relpath]}"
+               else
+                   label="$default_label"
+               fi
+               print_entry_file "$context_path" "$label"
+               done
+           }
+           audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts.bin" )
+           sudo grep -q "m34" "vendor/mount/build.prop" && \
+               audio_blobs=( "calliope_sram.bin" "vts.bin" )
+
+           for b in "${audio_blobs[@]}"; do
+               mv "vendor/firmware/$b" "vendor/firmware/${{ matrix.model }}/$b"
            done
-           find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/${{ matrix.model }}/$b 0 0 644 capabilities=0x0" >> "../../fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           done
+           generate_file_contexts "vendor/firmware/${{ matrix.model }}" "u:object_r:tee_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+           generate_file_contexts "vendor/tee/${{ matrix.model }}" "u:object_r:tee_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
+
+           print_entry_fs() {
+               local path="$1"
+               local gid="$2"
+               local mode="$3"
+               echo "$path 0 $gid $mode capabilities=0x0"
+           }
+
+           generate_entries() {
+               local base="$1"
+               local gid_dir="2000"
+               local gid_file="0"
+               find "$base" -printf '%P\n' | sort | while read -r relpath; do
+                   fullpath="$base/$relpath"
+                   outpath="${fullpath#./}"
+                   [ -z "$relpath" ] && continue
+                   if [ -d "$fullpath" ]; then
+                       print_entry_fs "$outpath" "$gid_dir" "755"
+                       elif [ -f "$fullpath" ]; then
+                       print_entry_fs "$outpath" "$gid_file" "644"
+                   fi
+               done
+           }
+
+           generate_entries "vendor/firmware/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+           generate_entries "vendor/tee" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
 
       - name: Unmount vendor
         if: env.need_update == 1
