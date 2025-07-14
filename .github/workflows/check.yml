@@ -26,6 +26,18 @@ jobs:
             csc: "TPA"
             omc: "TPA"
             imei: "357518816398424"
+          - model: "SM-M346B"
+            csc: "INS"
+            omc: "INS"
+            imei: "350886063201709"
+          - model: "SM-M346B1"
+            csc: "XEO"
+            omc: "XEO"
+            imei: "353257871234562"
+          - model: "SM-M346B2"
+            csc: "TUR"
+            omc: "TUR"
+            imei: "353903640123459"
 
     steps:
       - name: Checkout repo
@@ -169,10 +181,19 @@ jobs:
            find . -type f | sed 's|^\./||' | sort | while read -r b; do
                echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
+
            cd ../firmware
-           find . -type f \( -name "APDV_AUDIO_SLSI.bin" -o -name "AP_AUDIO_SLSI.bin" -o -name "NPU.bin" -o -name "calliope_sram.bin" -o -name "mfc_fw.bin" -o -name "os.checked.bin" -o -name "vts.bin" \) \
-           | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
+           fw_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "NPU.bin" "calliope_sram.bin" "mfc_fw.bin" "os.checked.bin" "vts.bin" )
+           grep -q "m34" "../mount/build.prop" && \
+               fw_blobs=( "NPU.bin" "calliope_sram.bin" "mfc_fw.bin" "os.checked.bin" "vts.bin" )
+           find_cmd=(find . -type f)
+           for blob in "${fw_blobs[@]}"; do
+               find_cmd+=(-o -name "$blob")
+           done
+           find_cmd[3]='-name'
+           "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
+               echo "vendor/tee/$b:vendor/tee/SM-${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+               >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
            done
 
       - name: Generate file_context and fs_config for TEEgris firmware
@@ -205,7 +226,7 @@ jobs:
           git add proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}
           git add file_context/file.${{ matrix.model }}_${{ matrix.omc }}
           git add fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}
-          git commit -m "a53x: ${{ matrix.model }}: ${{ env.latest_version }}"
+          git commit -m "s5e8825: ${{ matrix.model }}: ${{ env.latest_version }}"
           git tag "${{ env.latest_shortversion }}_${{ matrix.omc }}"
 
       - name: Push changes to repo

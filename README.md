@@ -1,5 +1,5 @@
 # Modem and bootloader repository
-**for Samsung Galaxy A54 5G**
+**for devices with Exynos 1280 (s5e8825)**
 
 To [download](https://github.com/BlackMesa123/proprietary_vendor_samsung_a54x/releases) the correct binaries for your firmware, check your device's model number and your current OMC sales code (ex. A546B**OXM**3AWF4):
 
