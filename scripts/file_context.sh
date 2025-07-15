@@ -1,6 +1,3 @@
-audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts.bin" )
-sudo grep -q "m34" "vendor/mount/build.prop" && audio_blobs=( "calliope_sram.bin" "vts.bin" )
-
 print_entry_file() {
     local path="$1"
     local label="$2"
@@ -33,16 +30,16 @@ generate_file_contexts() {
 [ -f "file_context/file.${MODEL}_${OMC}" ] && rm -f "file_context/file.${MODEL}_${OMC}"
 
 {
-    generate_file_contexts "vendor/firmware" "u:object_r:vendor_fw_file:s0"
+    if ! sudo grep -q "m34" "vendor/mount/build.prop"; then
+        echo "/vendor/firmware/AP_AUDIO_SLSI\.bin u:object_r:vendor_fw_file:s0"
+        echo "/vendor/firmware/APDV_AUDIO_SLSI\.bin u:object_r:vendor_fw_file:s0"
+    fi
+    echo "/vendor/firmware/calliope_sram\.bin u:object_r:vendor_fw_file:s0"
     echo "/vendor/firmware/NPU\.bin u:object_r:vendor_npu_firmware_file:s0"
     echo "/vendor/firmware/os\.checked\.bin u:object_r:vendor_fw_file:s0"
+    echo "/vendor/firmware/vts\.bin u:object_r:vendor_fw_file:s0"
     generate_file_contexts "vendor/tee" "u:object_r:tee_file:s0"
 } >> "file_context/file.${MODEL}_${OMC}"
-
-mkdir -p "vendor/firmware/${MODEL}"
-for b in "${audio_blobs[@]}"; do
-    mv "vendor/firmware/$b" "vendor/firmware/${MODEL}/$b"
-done
 
 mv vendor/tee vendor/tee_old
 mkdir -p vendor/tee/${MODEL}
@@ -50,14 +47,18 @@ cp -rfa vendor/tee_old/* vendor/tee/${MODEL}
 
 {
     echo ""
-    echo "Custom Path"
-    generate_file_contexts "vendor/firmware/${MODEL}" "u:object_r:vendor_fw_file:s0"
+    echo "# Custom Path"
+    echo "/vendor/firmware/${MODEL} u:object_r:vendor_fw_file:s0"
+    if ! sudo grep -q "m34" "vendor/mount/build.prop"; then
+        echo "/vendor/firmware/${MODEL}/AP_AUDIO_SLSI\.bin u:object_r:vendor_fw_file:s0"
+        echo "/vendor/firmware/${MODEL}/APDV_AUDIO_SLSI\.bin u:object_r:vendor_fw_file:s0"
+    fi
+    echo "/vendor/firmware/${MODEL}/calliope_sram\.bin u:object_r:vendor_fw_file:s0"
     echo "/vendor/firmware/${MODEL}/NPU\.bin u:object_r:vendor_npu_firmware_file:s0"
     echo "/vendor/firmware/${MODEL}/os\.checked\.bin u:object_r:vendor_fw_file:s0"
+    echo "/vendor/firmware/${MODEL}/vts\.bin u:object_r:vendor_fw_file:s0"
     generate_file_contexts "vendor/tee/${MODEL}" "u:object_r:tee_file:s0"
 } >> "file_context/file.${MODEL}_${OMC}"
 
 rm -rf vendor/tee/${MODEL}
 cp -rfa vendor/tee_old/* vendor/tee
-mv -f vendor/firmware/${MODEL}/* vendor/firmware
-rm -rf vendor/firmware/${MODEL}

@@ -25,25 +25,31 @@ generate_entries() {
 [ -f "fs_config/fs.${MODEL}_${OMC}" ] && rm -f "fs_config/fs.${MODEL}_${OMC}"
 
 {
-    generate_entries "vendor/firmware"
+    if ! sudo grep -q "m34" "vendor/mount/build.prop"; then
+        echo "vendor/firmware/AP_AUDIO_SLSI.bin 0 0 644 capabilities=0x0"
+        echo "vendor/firmware/APDV_AUDIO_SLSI.bin 0 0 644 capabilities=0x0"
+    fi
+    echo "vendor/firmware/calliope_sram.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/NPU.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/os.checked.bin 0 0 644 capabilities=0x0"
+    echo "vendor/firmware/vts.bin 0 0 644 capabilities=0x0"
     generate_entries "vendor/tee"
 } >> "fs_config/fs.${MODEL}_${OMC}"
-
-mkdir -p "vendor/firmware/${MODEL}"
-for b in "${audio_blobs[@]}"; do
-    mv "vendor/firmware/$b" "vendor/firmware/${MODEL}/$b"
-done
 
 mkdir -p vendor/tee/${MODEL}
 cp -rfa vendor/tee_old/* vendor/tee/${MODEL}
 
 {
     echo ""
-    echo "Custom Path"
-    generate_entries "vendor/firmware/${MODEL}"
+    echo "# Custom Path"
+    echo "vendor/firmware/${MODEL} 0 0 644 capabilities=0x0"
+    if ! sudo grep -q "m34" "vendor/mount/build.prop"; then
+        echo "vendor/firmware/${MODEL}/AP_AUDIO_SLSI.bin 0 0 644 capabilities=0x0"
+        echo "vendor/firmware/${MODEL}/APDV_AUDIO_SLSI.bin 0 0 644 capabilities=0x0"
+    fi
+    echo "vendor/firmware/${MODEL}/calliope_sram.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/${MODEL}/NPU.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/${MODEL}/os.checked.bin 0 0 644 capabilities=0x0"
+    echo "vendor/firmware/${MODEL}/vts.bin 0 0 644 capabilities=0x0"
     generate_entries "vendor/tee/${MODEL}"
 } >> "fs_config/fs.${MODEL}_${OMC}"
