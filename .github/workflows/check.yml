@@ -70,19 +70,12 @@ jobs:
           submodules: true
 
       - name: Compare latest version with current version
+        env:
+          MODEL: ${{ matrix.model }}
+          CSC: ${{ matrix.csc }}
+          OMC: ${{ matrix.omc }}
         run: |
-          need_update=0
-          latest=`curl --retry 5 --retry-delay 5 http://fota-cloud-dn.ospserver.net/firmware/${{ matrix.csc }}/${{ matrix.model }}/version.xml | grep latest | sed 's/^[^>]*>//' | sed 's/<.*//'`
-          latest_short=`echo $latest | cut -d'/' -f1`
-          latest_csc=`echo $latest | cut -d'/' -f2`
-          latest_modem=`echo $latest | cut -d'/' -f3`
-          current=`cat current.${{ matrix.model }}_${{ matrix.omc }}` || need_update=1
-          [[ $latest != $current ]] && need_update=1
-          echo "latest_version=$latest" >> $GITHUB_ENV
-          echo "latest_shortversion=$latest_short" >> $GITHUB_ENV
-          echo "latest_cscversion=$latest_csc" >> $GITHUB_ENV
-          echo "latest_modemversion=$latest_modem" >> $GITHUB_ENV
-          echo "need_update=$need_update" >> $GITHUB_ENV
+          ./scripts/compare.sh
 
       - name: Set up Node.js
         if: env.need_update == 1
@@ -106,24 +99,19 @@ jobs:
       - name: Get path of files
         if: env.need_update == 1
         run: |
-          echo "ap_tar=`find -name AP*`" >> $GITHUB_ENV
-          echo "bl_tar=`find -name BL*`" >> $GITHUB_ENV
-          echo "cp_tar=`find -name CP*`" >> $GITHUB_ENV
-          echo "csc_tar=`find -name CSC*`" >> $GITHUB_ENV
-          echo "home_csc_tar=`find -name HOME_CSC*`" >> $GITHUB_ENV
+          ./scripts/get_path.sh
 
       - name: Check downloaded firmware version
         if: env.need_update == 1
+        env:
+          AP_TAR: ${{ env.ap_tar }}
+          CSC_TAR: ${{ env.csc_tar }}
+          CP_TAR: ${{ env.cp_tar }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
+          LATEST_CSCVERSION: ${{ env.latest_cscversion }}
+          LATEST_MODEMVERSION: ${{ env.latest_modemversion }}
         run: |
-          version_short=`echo ${{ env.ap_tar }} | cut -d'_' -f3`
-          version_csc=`echo ${{ env.csc_tar }} | cut -d'_' -f4`
-          version_modem=`echo ${{ env.cp_tar }} | cut -d'_' -f3`
-          [[ $version_short == ${{ env.latest_shortversion }} ]]
-          [[ $version_csc == ${{ env.latest_cscversion }} ]]
-          [[ $version_modem == ${{ env.latest_modemversion }} ]]
-          echo PDA version: $version_short > versions.txt
-          echo CSC version: $version_csc >> versions.txt
-          echo Modem version: $version_modem >> versions.txt
+          ./scripts/check.sh
 
       - name: Cleanup space
         if: env.need_update == 1
@@ -136,11 +124,10 @@ jobs:
       - name: Extract kernel images
         if: env.need_update == 1
         env:
-          FILES: boot.img.lz4 dtbo.img.lz4 vbmeta.img.lz4 vendor_boot.img.lz4
+          AP_TAR: ${{ env.ap_tar }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
-          for file in $FILES; do tar xvf ${{ env.ap_tar }} ${file}; done
-          tar cvf ${{ env.latest_shortversion }}_kernel.tar *.lz4
-          rm *.lz4
+          ./scripts/kernel.sh
 
       - name: Extract PIT file
         if: env.need_update == 1
@@ -150,205 +137,69 @@ jobs:
 
       - name: Generate patched vbmeta
         if: env.need_update == 1
+        env:
+          AP_TAR: ${{ env.ap_tar }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
-          tar xvf ${{ env.ap_tar }} vbmeta.img.lz4
-          lz4 -d vbmeta.img.lz4 vbmeta.img
-          rm vbmeta.img.lz4
-          printf "$(printf '\\x%02X' 3)" | dd of="vbmeta.img" bs=1 seek=123 count=1 conv=notrunc &> /dev/null
-          tar cvf ${{ env.latest_shortversion }}_patched_vbmeta.tar vbmeta.img
-          rm vbmeta.img
+          ./scripts/vbmeta.sh
 
       - name: Extract vendor partition
         if: env.need_update == 1
+        env:
+          AP_TAR: ${{ env.ap_tar }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
-          tar xvf ${{ env.ap_tar }} super.img.lz4
-          lz4 -d super.img.lz4 super.img
-          rm super.img.lz4
-          simg2img super.img super_raw.img
-          rm super.img
-          mv super_raw.img super.img
-          ./tools/lpunpack -p vendor super.img .
-          rm super.img
-          [[ -e vendor.img ]] && zip ${{ env.latest_shortversion }}_vendor.zip vendor.img
+          ./scripts/vendor.sh
 
       - name: Get tee blobs
         if: env.need_update == 1
+        env:
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
-           mkdir -p vendor/mount vendor/tee
-           sudo mount vendor.img vendor/mount
-           cp -rfa vendor/mount/tee vendor
-           cd vendor
-           zip -r0 --store ${{ env.latest_shortversion }}_tee.zip "tee"
-           mv -f ${{ env.latest_shortversion }}_tee.zip ../
+          ./scripts/tee.sh
            
       - name: Get firmware blobs
         if: env.need_update == 1
+        env:
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
-           mkdir -p vendor/firmware 
-           cp -rfa vendor/mount/firmware vendor
-           cd vendor
-           zip -r0 --store ${{ env.latest_shortversion }}_firmware.zip "firmware"
-           mv -f ${{ env.latest_shortversion }}_firmware.zip ../
-           cd ../
+          ./scripts/fw_blobs.sh
 
       - name: Generate proprietary-files.txt
         if: env.need_update == 1
+        env:
+          MODEL: ${{ matrix.model }}
+          OMC: ${{ matrix.omc }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
-           [ -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           cd vendor/firmware
-           audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts.bin" )
-           sudo grep -q "m34" "../mount/build.prop" && \
-               audio_blobs=( "calliope_sram.bin" "vts.bin" )
-
-           fw_blobs=( "NPU.bin"  "mfc_fw.bin" "os.checked.bin" )
-
-           find_cmd=(find . \( )
-           for i in "${!audio_blobs[@]}"; do
-               if [ $i -ne 0 ]; then
-                   find_cmd+=( -o )
-               fi
-               find_cmd+=( -name "${audio_blobs[i]}" )
-           done
-           find_cmd+=( \) -type f )
-
-           echo "# Audio Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
-                echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
-                >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           done
-           echo "" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-
-           find_cmd=(find . \( )
-           for i in "${!fw_blobs[@]}"; do
-               if [ $i -ne 0 ]; then
-                   find_cmd+=( -o )
-               fi
-               find_cmd+=( -name "${fw_blobs[i]}" )
-           done
-           find_cmd+=( \) -type f )
-
-           echo "# Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           "${find_cmd[@]}" | sed 's|^\./||' | sort | while read -r b; do
-                echo "vendor/firmware/$b:vendor/firmware/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" \
-                >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           done
-           echo "" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-
-           cd ../tee
-           echo "# TEEgris Firmware - from ${{ matrix.model }} - ${{ env.latest_shortversion }}" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           find . -type f | sed 's|^\./||' | sort | while read -r b; do
-               echo "vendor/tee/$b:vendor/tee/${{ matrix.model }}/$b|$(sha1sum "$b" | awk '{print $1}')" >> "../../proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}"
-           done
+          ./scripts/proprietary-files.sh
 
       - name: Generate proprietary-firmware.txt
         if: env.need_update == 1
+        env:
+          MODEL: ${{ matrix.model }}
+          OMC: ${{ matrix.omc }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
+          BL_TAR: ${{ env.bl_tar }}
+          CP_TAR: ${{ env.cp_tar }}
         run: |
-           mkdir bl
-           cd bl
-           tar xvf ../${{ env.bl_tar }}
-           tar xvf ../${{ env.cp_tar }}
-           lz4 -d -m *.lz4
-           rm -rf *.lz4
-           for i in *; do
-               mv $i ${i}_${{ matrix.model }}
-           done
+          ./scripts/proprietary-firmware.sh
 
-           rm -f "vbmeta.img"
-
-           zip -r0 --store "../${{ env.latest_shortversion }}_BL_CP-los.zip" .
-
-           [ -f "proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
-
-           {
-               echo "# Firmware for model ${{ matrix.model }} - from Samsung package version ${{ env.latest_shortversion }}"
-               sha1sum * | awk '{print $2 "|" $1}'
-               echo ""
-           } >> "../proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
-
-           echo "${{ env.latest_shortversion }}" >> "version_${{ matrix.model }}"
-           {
-               echo "# File containing the supported models, one per line"
-               sha1sum "version_${{ matrix.model }}" | awk '{print $2 "|" $1}'
-           } >> "../proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}"
-
-      - name: Generate file_context and fs_config for TEEgris firmware
+      - name: Generate file_context
         if: env.need_update == 1
+        env:
+          MODEL: ${{ matrix.model }}
+          OMC: ${{ matrix.omc }}
         run: |
-           [ -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
-           [ -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}" ] && rm -f "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           mkdir -p "vendor/firmware/${{ matrix.model }}"
-           mv vendor/tee vendor/tee_old
-           mkdir -p vendor/tee
-           mv vendor/tee_old/ vendor/tee/${{ matrix.model }}
-           print_entry_file() {
-               local path="$1"
-               local label="$2"
-               echo "$path $label"
-           }
-
-           generate_file_contexts() {
-                   local base="$1"
-                   local default_label="$2"
-                   declare -A custom_labels=(
-                       ["NPU.bin"]="u:object_r:vendor_npu_firmware_file:s0"
-                   )
-                   local base_context_path="/vendor/${base#vendor/}"
-                   print_entry_file "$base_context_path" "$default_label"
-                   find "$base" -type f -o -type d | sort | while read -r fullpath; do
-                   if [[ "$fullpath" == "$base" ]]; then
-                       continue
-                   fi
-                   relpath="${fullpath#$base/}"
-                   context_path="/vendor/${base#vendor/}/$(printf "%s" "$relpath" | sed 's/\./\\./g')"
-                   if [[ -n "${custom_labels[$relpath]}" ]]; then
-                       label="${custom_labels[$relpath]}"
-                   else
-                       label="$default_label"
-                   fi
-                   print_entry_file "$context_path" "$label"
-               done
-           }
-
-           audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts.bin" )
-           sudo grep -q "m34" "vendor/mount/build.prop" && \
-               audio_blobs=( "calliope_sram.bin" "vts.bin" )
-
-           for b in "${audio_blobs[@]}"; do
-               mv "vendor/firmware/$b" "vendor/firmware/${{ matrix.model }}/$b"
-           done
-           generate_file_contexts "vendor/firmware/${{ matrix.model }}" "u:object_r:vendor_fw_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
-           echo "/vendor/firmware/${{ matrix.model }}/NPU\.bin u:object_r:vendor_npu_firmware_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
-           echo "/vendor/firmware/${{ matrix.model }}/os\.checked\.bin u:object_r:vendor_fw_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
-           generate_file_contexts "vendor/tee/${{ matrix.model }}" "u:object_r:tee_file:s0" >> "file_context/file.${{ matrix.model }}_${{ matrix.omc }}"
-
-           print_entry_fs() {
-               local path="$1"
-               local gid="$2"
-               local mode="$3"
-               echo "$path 0 $gid $mode capabilities=0x0"
-           }
-
-           generate_entries() {
-               local base="$1"
-               local gid_dir="2000"
-               local gid_file="0"
-               print_entry_fs "$base" "$gid_dir" "755"
-               find "$base" -printf '%P\n' | sort | while read -r relpath; do
-                   [ -z "$relpath" ] && continue
-                   fullpath="$base/$relpath"
-                   outpath="${fullpath#./}"
-                   if [ -d "$fullpath" ]; then
-                       print_entry_fs "$outpath" "$gid_dir" "755"
-                   elif [ -f "$fullpath" ]; then
-                       print_entry_fs "$outpath" "$gid_file" "644"
-                   fi
-               done
-           }
-
-           generate_entries "vendor/firmware/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           echo "vendor/firmware/${{ matrix.model }}/NPU.bin 0 0 644 capabilities=0x0" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           echo "vendor/firmware/${{ matrix.model }}/os.checked.bin 0 0 644 capabilities=0x0" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
-           generate_entries "vendor/tee/${{ matrix.model }}" >> "fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}"
+          ./scripts/file_context.sh
+      
+      - name: Generate fs_config
+        if: env.need_update == 1
+        env:
+          MODEL: ${{ matrix.model }}
+          OMC: ${{ matrix.omc }}
+        run: |
+          ./scripts/fs_config.sh
 
       - name: Unmount vendor
         if: env.need_update == 1
@@ -358,18 +209,14 @@ jobs:
 
       - name: Update current version
         if: env.need_update == 1
+        env:
+          MODEL: ${{ matrix.model }}
+          OMC: ${{ matrix.omc }}
+          LATEST_VERSION: ${{ env.latest_version }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
+          GHF: ${{ github.ref }}
         run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git pull origin ${{github.ref}} --ff-only
-          echo ${{ env.latest_version }} > current.${{ matrix.model }}_${{ matrix.omc }}
-          git add current.${{ matrix.model }}_${{ matrix.omc }}
-          git add proprietary-files/proprietary.${{ matrix.model }}_${{ matrix.omc }}
-          git add proprietary-firmware/firmware.${{ matrix.model }}_${{ matrix.omc }}
-          git add file_context/file.${{ matrix.model }}_${{ matrix.omc }}
-          git add fs_config/fs.${{ matrix.model }}_${{ matrix.omc }}
-          git commit -m "s5e8825: ${{ matrix.model }}: ${{ env.latest_version }}"
-          git tag "${{ env.latest_shortversion }}_${{ matrix.omc }}"
+          ./scripts/update.sh
 
       - name: Push changes to repo
         if: env.need_update == 1
