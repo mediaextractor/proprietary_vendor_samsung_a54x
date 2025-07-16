@@ -22,6 +22,6 @@ zip -r0 --store "../${LATEST_SHORTVERSION}_BL_CP-los.zip" .
 
 echo "${LATEST_SHORTVERSION}" >> "version_${MODEL}"
 {
-    echo "# "Files containing Samsung package version for supported models
+    echo "# Files containing Samsung package version for supported models"
     sha1sum "version_${MODEL}" | awk '{print $2 "|" $1}'
 } >> "../proprietary-firmware/firmware.${MODEL}_${OMC}"
