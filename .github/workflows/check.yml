@@ -154,6 +154,7 @@ jobs:
       - name: Extract vendor partition
         if: env.need_update == 1
         env:
+          MODEL: ${{ matrix.model }}
           AP_TAR: ${{ env.ap_tar }}
           LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
         run: |
@@ -250,7 +251,7 @@ jobs:
             ${{ env.pit_file }}
             ${{ env.latest_shortversion }}_patched_vbmeta.tar
             ${{ env.latest_shortversion }}_vendor.zip
+            ${{ env.latest_shortversion }}_vendor-extracted.zip
             ${{ env.latest_shortversion }}_tee.zip
             ${{ env.latest_shortversion }}_firmware.zip
             ${{ env.latest_shortversion }}_BL_CP-los.zip
-
