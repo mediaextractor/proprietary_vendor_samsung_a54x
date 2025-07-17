@@ -70,6 +70,10 @@ jobs:
             csc: "TUR"
             omc: "TUR"
             imei: "353903640123459"
+          - model: "SM-P620"
+            csc: "EUX"
+            omc: "EUX"
+            imei: "R52Y1082J0Y"
 
     steps:
       - name: Checkout repo
