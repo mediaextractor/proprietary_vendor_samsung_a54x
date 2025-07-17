@@ -35,6 +35,7 @@ generate_file_contexts() {
         echo "/vendor/firmware/APDV_AUDIO_SLSI\.bin u:object_r:vendor_fw_file:s0"
     fi
     echo "/vendor/firmware/calliope_sram\.bin u:object_r:vendor_fw_file:s0"
+    echo "/vendor/firmware/mfc_fw\.bin u:object_r:vendor_fw_file:s0"
     echo "/vendor/firmware/NPU\.bin u:object_r:vendor_npu_firmware_file:s0"
     echo "/vendor/firmware/os\.checked\.bin u:object_r:vendor_fw_file:s0"
     echo "/vendor/firmware/vts\.bin u:object_r:vendor_fw_file:s0"
@@ -54,6 +55,7 @@ cp -rfa vendor/tee_old/* vendor/tee/${MODEL}
         echo "/vendor/firmware/${MODEL}/APDV_AUDIO_SLSI\.bin u:object_r:vendor_fw_file:s0"
     fi
     echo "/vendor/firmware/${MODEL}/calliope_sram\.bin u:object_r:vendor_fw_file:s0"
+    echo "/vendor/firmware/${MODEL}/mfc_fw\.bin u:object_r:vendor_fw_file:s0"
     echo "/vendor/firmware/${MODEL}/NPU\.bin u:object_r:vendor_npu_firmware_file:s0"
     echo "/vendor/firmware/${MODEL}/os\.checked\.bin u:object_r:vendor_fw_file:s0"
     echo "/vendor/firmware/${MODEL}/vts\.bin u:object_r:vendor_fw_file:s0"

@@ -30,6 +30,7 @@ generate_entries() {
         echo "vendor/firmware/APDV_AUDIO_SLSI.bin 0 0 644 capabilities=0x0"
     fi
     echo "vendor/firmware/calliope_sram.bin 0 0 644 capabilities=0x0"
+    echo "vendor/firmware/mfc_fw.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/NPU.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/os.checked.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/vts.bin 0 0 644 capabilities=0x0"
@@ -48,6 +49,7 @@ cp -rfa vendor/tee_old/* vendor/tee/${MODEL}
         echo "vendor/firmware/${MODEL}/APDV_AUDIO_SLSI.bin 0 0 644 capabilities=0x0"
     fi
     echo "vendor/firmware/${MODEL}/calliope_sram.bin 0 0 644 capabilities=0x0"
+    echo "vendor/firmware/${MODEL}/mfc_fw.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/${MODEL}/NPU.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/${MODEL}/os.checked.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/${MODEL}/vts.bin 0 0 644 capabilities=0x0"
