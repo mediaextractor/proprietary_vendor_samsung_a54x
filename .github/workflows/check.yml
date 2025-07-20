@@ -10,10 +10,6 @@ jobs:
   update:
     runs-on: ubuntu-latest
 
-    concurrency:
-      group: "update"
-      cancel-in-progress: true
-
     strategy:
       fail-fast: false
       matrix:
@@ -79,6 +75,10 @@ jobs:
             omc: "EUX"
             imei: "R52Y1082J0Y"
 
+    concurrency:
+      group: "update-${{ matrix.model }}"
+      cancel-in-progress: true
+ 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
