@@ -10,6 +10,10 @@ jobs:
   update:
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: "update"
+      cancel-in-progress: true
+
     strategy:
       fail-fast: false
       matrix:
