@@ -1,0 +1,18 @@
+# Firmware for model SM-A546E - from Samsung package version A546EXXSDDYF1
+dtp.bin_SM-A546E|59eb20182cc0f985495a10e11c1a8f98ad502988
+fld.bin_SM-A546E|5bb002b94144018d4b450eec3e8ce9ff5a20d874
+harx.bin_SM-A546E|c65d4d3381d96c9ad5fe8e1a9e35fae05aad8c27
+keystorage.bin_SM-A546E|bd6f25d863ae66f4a1c388131e3380d130119a69
+ldfw.img_SM-A546E|93a95484d1358d1d6002fabdfab2525cd84cd5f9
+modem.bin_SM-A546E|f0c5ac7f3b4e5a17616ac44e342754ae248387f1
+modem_debug.bin_SM-A546E|3c15819d4d1fafdf74e7d719e48f763b0ef08e4e
+sboot.bin_SM-A546E|263ca542bab7076015a755591c1d03892f5f805d
+ssp.img_SM-A546E|90d29bcb1f48e1fb9c059f11f91a3b9abfe281dc
+tzar.img_SM-A546E|e236598c35d745154b6d01046acddb483f8a37e5
+tzsw.img_SM-A546E|9e635da10ed3a50f3a8199ea4dc2c68939973b8f
+uh.bin_SM-A546E|189ff3f0bad31fb46f3e11f87f8b5912ea490520
+up_param.bin_SM-A546E|93b924a4a66348e8e6cc4d074839611b5a2ccdf6
+vbmeta.img_SM-A546E|39cbb59569cc34131246789ae03c8e4910a1ef47
+
+# Files containing Samsung package version for supported models
+version_SM-A546E|fe4713312359e7ee2701284b3b982d7bd6487530
