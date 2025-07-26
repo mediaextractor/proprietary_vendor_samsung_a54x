@@ -108,6 +108,40 @@ done
 
 cd ../firmware
 echo "" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+echo "# With sha1sum and path to model" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+echo "# Audio Firmware - from ${MODEL} - ${LATEST_SHORTVERSION}" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+for b in "${audio_blobs[@]}"; do
+    if find -type f -name "$b" -print -quit | grep -q .; then
+        echo "vendor/firmware/${MODEL}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+        >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+    else
+        echo "Warning: $b not found."
+    fi
+done
+echo "" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+
+echo "# Firmware - from ${MODEL} - ${LATEST_SHORTVERSION}" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+for b in "${fw_blobs[@]}"; do
+    if find -type f -name "$b" -print -quit | grep -q .; then
+        echo "vendor/firmware/${MODEL}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+        >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+    else
+        echo "Warning: $b not found."
+    fi
+done
+echo "" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+
+cd ../tee
+echo "# TEEgris Firmware - from ${MODEL} - ${LATEST_SHORTVERSION}" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+find -type f | sed 's|^\./||' | sort | while read -r b; do
+    echo "vendor/tee/${MODEL}/$b|$(sha1sum "$b" | awk '{print $1}')" \
+    >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
+done
+
+#####################################################################################
+
+cd ../firmware
+echo "" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
 echo "# With custom path and sha1sum" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
 echo "# Audio Firmware - from ${MODEL} - ${LATEST_SHORTVERSION}" >> "../../proprietary-files/proprietary.${MODEL}_${OMC}"
 for b in "${audio_blobs[@]}"; do
