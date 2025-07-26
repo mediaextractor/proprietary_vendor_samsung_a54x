@@ -78,6 +78,10 @@ jobs:
             csc: "EUX"
             omc: "EUX"
             imei: "R52Y1082J0Y"
+          - model: "SM-P625"
+            csc: "EUX"
+            omc: "EUX"
+            imei: "R52X506ETTN"
 
     concurrency:
       group: "update-${{ matrix.model }}-${{ matrix.csc }}"
