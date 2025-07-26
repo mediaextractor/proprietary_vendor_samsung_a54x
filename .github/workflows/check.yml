@@ -24,7 +24,7 @@ jobs:
             imei: "350090711234564"
 
     concurrency:
-      group: "update-${{ matrix.model }}"
+      group: "update-${{ matrix.model }}-${{ matrix.csc }}"
       cancel-in-progress: true
  
     steps:
