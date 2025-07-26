@@ -22,6 +22,10 @@ jobs:
             csc: "EGY"
             omc: "EGY"
             imei: "350090711234564"
+          - model: "SM-A5460"
+            csc: "CHC"
+            omc: "CHC"
+            imei: "351677831234562"
 
     concurrency:
       group: "update-${{ matrix.model }}-${{ matrix.csc }}"
