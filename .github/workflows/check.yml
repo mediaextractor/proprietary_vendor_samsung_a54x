@@ -25,7 +25,7 @@ jobs:
           - model: "SM-A5460"
             csc: "CHC"
             omc: "CHC"
-            imei: "351677831234562"
+            imei: "350040121234563"
 
     concurrency:
       group: "update-${{ matrix.model }}-${{ matrix.csc }}"
