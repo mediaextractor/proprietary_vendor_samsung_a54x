@@ -1,0 +1,16 @@
+# Firmware for model SM-M336B - from Samsung package version M336BXXUCFYE5
+fld.bin_SM-M336B|423223802d3ad36a89835e88195c04604445c222
+harx.bin_SM-M336B|ed0a4828394274ffd8fb8ed1e0ce24399aa72a8c
+keystorage.bin_SM-M336B|7fe4c95999f3ede2f3b33d999eb5b547b81176da
+ldfw.img_SM-M336B|06cfebffa23c034767f5759290a4c3d9ca786c60
+modem.bin_SM-M336B|0a970adaefaf8d336442081d63b8dc9e31ae09ac
+modem_debug.bin_SM-M336B|bc1ae1ac95be5e37ff15e036da5a28786181ca20
+sboot.bin_SM-M336B|3d35343bafc11e7057bbd18e704daf25dc1fa319
+tzar.img_SM-M336B|e5b9e6279ad800088ff2538f24315a082208be13
+tzsw.img_SM-M336B|cb9c9514d068193628d5ccdcf3268a20cd9dc5c4
+uh.bin_SM-M336B|16b47cea188df16207d7bc2d3d9fa8a0216c2812
+up_param.bin_SM-M336B|b37a940392ec4400aa9bbcaadde364eaa3020af4
+vbmeta.img_SM-M336B|6c684d395f7cffef5c941c2efb8ccc3bff3edef9
+
+# Files containing Samsung package version for supported models
+version_SM-M336B|4fa04588e0bf75f1f8f19b0cc316d031fddf343e
