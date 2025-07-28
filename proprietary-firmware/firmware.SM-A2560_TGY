@@ -1,0 +1,16 @@
+# Firmware for model SM-A2560 - from Samsung package version A2560ZHU6CYE1
+fld.bin_SM-A2560|3e1fc9f4e028a753ad96d3f549f35cd7810a82c7
+harx.bin_SM-A2560|5d54556129f40ef45bfb3fc8c47a22238843ed58
+keystorage.bin_SM-A2560|7b804ff853df745a0fac002e26c5ec3d50c76f7e
+ldfw.img_SM-A2560|b84a0a680dad5e73d29ffa52d742c89ea211eb17
+modem.bin_SM-A2560|fe3aaaacd49dd3e8d0d53547a720c882de6011cf
+modem_debug.bin_SM-A2560|3b3057a60421cb57bd7e1509c71009f57f032367
+sboot.bin_SM-A2560|d966c4ba25af17c6d29a72db44e702cce287cce6
+tzar.img_SM-A2560|40e254d16921ef72ce5cf65506f95638b4b6c08f
+tzsw.img_SM-A2560|7dd865593ce725c67977b059734db76c38fb1707
+uh.bin_SM-A2560|9fce7ed3dca5538c757fcd7778020a866a2f9f6b
+up_param.bin_SM-A2560|77bc6df0e02dea6c5785ac9e6fa1c97bc90cab18
+vbmeta.img_SM-A2560|29e3ea92758b706d6b6359c1244fc969522e7c0e
+
+# Files containing Samsung package version for supported models
+version_SM-A2560|7d158e4dda2c7f2dcc39810f60e252f784777add
