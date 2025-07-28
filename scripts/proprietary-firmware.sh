@@ -12,7 +12,7 @@ rm -f "vbmeta.img"
 
 zip -r0 --store "../${LATEST_SHORTVERSION}_BL_CP-los.zip" .
 
-[ -f "proprietary-firmware/firmware.${MODEL}_${OMC}" ] && rm -f "proprietary-firmware/firmware.${MODEL}_${OMC}"
+rm -f "proprietary-firmware/firmware.${MODEL}_${OMC}"
 
 {
     echo "# Firmware for model ${MODEL} - from Samsung package version ${LATEST_SHORTVERSION}"
