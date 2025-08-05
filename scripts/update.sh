@@ -7,5 +7,5 @@ git add proprietary-files/proprietary.${MODEL}_${OMC}
 git add proprietary-firmware/firmware.${MODEL}_${OMC}
 git add file_context/file.${MODEL}_${OMC}
 git add fs_config/fs.${MODEL}_${OMC}
-git commit -m "s5e8825: ${MODEL}: ${LATEST_VERSION}"
+git commit -m "a54x: ${MODEL}: ${LATEST_VERSION}"
 git tag "${LATEST_SHORTVERSION}_${OMC}"
