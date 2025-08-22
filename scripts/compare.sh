@@ -1,3 +1,5 @@
+set -e
+
 need_update=0
 latest=$(curl --retry 20 --retry-delay 5 http://fota-cloud-dn.ospserver.net/firmware/${CSC}/${MODEL}/version.xml \
   | grep latest | sed 's/^[^>]*>//' | sed 's/<.*//')
