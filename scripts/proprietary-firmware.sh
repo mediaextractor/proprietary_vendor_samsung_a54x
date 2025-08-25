@@ -8,7 +8,7 @@ for i in *; do
     mv $i ${i}_${MODEL}
 done
 
-rm -f "vbmeta.img"
+rm -f "vbmeta.img"*
 
 zip -r0 --store "../${LATEST_SHORTVERSION}_BL_CP-los.zip" .
 
