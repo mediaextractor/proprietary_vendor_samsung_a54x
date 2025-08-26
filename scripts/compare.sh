@@ -1,7 +1,8 @@
 set -e
+set -o pipefail
 
 need_update=0
-latest=$(curl --retry 20 --retry-delay 5 http://fota-cloud-dn.ospserver.net/firmware/${CSC}/${MODEL}/version.xml \
+latest=$(curl --fail --retry 20 --retry-delay 5 http://fota-cloud-dn.ospserver.net/firmware/${CSC}/${MODEL}/version.xml \
   | grep latest | sed 's/^[^>]*>//' | sed 's/<.*//')
 latest_short=$(echo $latest | cut -d'/' -f1)
 latest_csc=$(echo $latest | cut -d'/' -f2)
