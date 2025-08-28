@@ -1,16 +1,16 @@
-# Firmware for model SM-A336M - from Samsung package version A336MUBUDFYE3
-fld.bin_SM-A336M|1ed7b2258c613e31b0b14f03f8553b75618c6381
-harx.bin_SM-A336M|d8c0ff0f6ab81d07c7ed9269549eecabd7534593
-keystorage.bin_SM-A336M|69924227fc75a43028d4b7af923e29f6383686cb
-ldfw.img_SM-A336M|f512090561a5aff954916ab62c97a0c1fd4710c5
-modem.bin_SM-A336M|ee343b2048537a549439fe5a1257a0bab43ab2d0
+# Firmware for model SM-A336M - from Samsung package version A336MUBSEFYH2
+
+fld.bin_SM-A336M|1411e295f21f4a905f5ceed40eb5632c8ebfea95
+harx.bin_SM-A336M|ccbbf3074ce0ac9ee66f1af3c9dda51e6d11ed02
+keystorage.bin_SM-A336M|23e0d89481daa2a9eafbd07af8110a6089ccff0f
+ldfw.img_SM-A336M|23b59bffcc934cd7cf9dd4d40f922a678ff0e85c
+modem.bin_SM-A336M|c531b36103b64fc4cba21689bd55a5ec998ae640
 modem_debug.bin_SM-A336M|2597938b053810b2d48a0b09e5fdb579d64b780f
-sboot.bin_SM-A336M|4e95740365411a8c3615b240cc8c97260d567460
-tzar.img_SM-A336M|e7cca1072bf6c014b9a06ae4ff786de23872d3c5
-tzsw.img_SM-A336M|e18aaab198c3526026b92ce81345a04e59f30c3a
-uh.bin_SM-A336M|a71abdfbfea9efb08a9a5c97501b94ec387cbb8c
-up_param.bin_SM-A336M|b2de69ae0b43fb18ef04851c3753bcda4d0cb923
-vbmeta.img_SM-A336M|343dac8eca33ad0074b3d6eed0b47055e63d772a
+sboot.bin_SM-A336M|3c98dcfaf23f1632758872baa7e82dab9f29716e
+tzar.img_SM-A336M|a2e5d83c0300b0f37293eb9f2660e922e9dfab10
+tzsw.img_SM-A336M|6c4a9307998d36535b14e60d0105f22ae198a11a
+uh.bin_SM-A336M|a4e76badfc02ef13f0184a962b1d7958cf287a61
+up_param.bin_SM-A336M|1773d78ee50ab76141f4af737e78981e59cc287f
 
 # Files containing Samsung package version for supported models
-version_SM-A336M|bb5cf59146fe0c64aff4417feba6102d7d5a49d1
+version_SM-A336M|b52e166ef6cc08451f7564a7906658fd2f60c77f
