@@ -1,4 +1,4 @@
-# Firmware for model SM-A546E - from Samsung package version A546EXXSFDYH1
+# Firmware for model SM-A546E - from Samsung package version 
 
 dtp.bin_SM-A546E|1edb0ae087b142c61d084712ab312ea7ef68ecc0
 fld.bin_SM-A546E|0aa983d2f500535926ff0acf17a2467ba771d241
@@ -16,4 +16,4 @@ up_param.bin_SM-A546E|81e3e4356e4c3fb4360333dbc2208c1f01c52f58
 vbmeta.img_SM-A546E|670d2152d2f69e05719f2cdceab31f8f5d6f771f
 
 # Files containing Samsung package version for supported models
-version_SM-A546E|5fe57bdaa2837d44c25e16ecb3ae9c724ec3f2e3
+version_SM-A546E|adc83b19e793491b1c6ea0fd8b46cd9f32e592fc
