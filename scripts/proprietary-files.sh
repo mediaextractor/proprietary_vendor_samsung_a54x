@@ -4,6 +4,7 @@ audio_blobs=( "APDV_AUDIO_SLSI.bin" "AP_AUDIO_SLSI.bin" "calliope_sram.bin" "vts
 sudo grep -q "m34" "../mount/build.prop" && audio_blobs=( "calliope_sram.bin" "vts.bin" )
 
 fw_blobs=( "NPU.bin"  "mfc_fw.bin" "os.checked.bin" )
+[[ -f "nfc/libsn100u_fw.so" ]] && fw_blobs+=( "libsn100u_fw.so" )
 
 #####################################################################################
 
