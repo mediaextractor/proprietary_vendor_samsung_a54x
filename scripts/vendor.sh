@@ -20,4 +20,4 @@ cp -rfa vendor/firmware/* vendor/firmware/${MODEL}
 cp -rfa vendor/tee/* vendor/tee/${MODEL}
 
 zip -r0 --store ${LATEST_SHORTVERSION}_vendor-extracted.zip vendor
-rm -rf vendor vendor_mount
+rm -rf vendor_mount

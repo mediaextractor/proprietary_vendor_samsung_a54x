@@ -22,7 +22,7 @@ generate_entries() {
     done
 }
 
-[ -f "fs_config/fs.${MODEL}_${OMC}" ] && rm -f "fs_config/fs.${MODEL}_${OMC}"
+[[ -f "fs_config/fs.${MODEL}_${CSC}_${OMC}" ]] && rm -f "fs_config/fs.${MODEL}_${CSC}_${OMC}"
 
 {
     if ! sudo grep -q "m34" "vendor/mount/build.prop"; then
@@ -35,7 +35,7 @@ generate_entries() {
     echo "vendor/firmware/os.checked.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/vts.bin 0 0 644 capabilities=0x0"
     generate_entries "vendor/tee"
-} >> "fs_config/fs.${MODEL}_${OMC}"
+} >> "fs_config/fs.${MODEL}_${CSC}_${OMC}"
 
 mkdir -p vendor/tee/${MODEL}
 cp -rfa vendor/tee_old/* vendor/tee/${MODEL}
@@ -54,4 +54,4 @@ cp -rfa vendor/tee_old/* vendor/tee/${MODEL}
     echo "vendor/firmware/${MODEL}/os.checked.bin 0 0 644 capabilities=0x0"
     echo "vendor/firmware/${MODEL}/vts.bin 0 0 644 capabilities=0x0"
     generate_entries "vendor/tee/${MODEL}"
-} >> "fs_config/fs.${MODEL}_${OMC}"
+} >> "fs_config/fs.${MODEL}_${CSC}_${OMC}"
