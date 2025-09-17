@@ -296,3 +296,4 @@ jobs:
             ${{ env.latest_shortversion }}_vendor-extracted.zip
             ${{ env.latest_shortversion }}_firmware_tee.zip
             ${{ env.latest_shortversion }}_BL_CP-los.zip
+            ${{ env.latest_shortversion}}_vendor.prop
