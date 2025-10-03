@@ -8,6 +8,10 @@ for i in *; do
     mv $i ${i}_${MODEL}
 done
 
+BL_LOCK="False"
+strings "sboot.bin_${MODEL}" | grep -q androidboot.other && BL_LOCK="True"
+echo "Bootloader Lock: $BL_LOCK" >> ../versions.txt
+
 rm -f "vbmeta.img"*
 
 [[ -f "../proprietary-firmware/firmware.${MODEL}_${CSC}_${OMC}" ]] && rm -f "../proprietary-firmware/firmware.${MODEL}_${CSC}_${OMC}"
