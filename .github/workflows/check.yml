@@ -170,10 +170,10 @@ jobs:
         env:
           AP_TAR: ${{ env.ap_tar }}
           CSC_TAR: ${{ env.csc_tar }}
-          CP_TAR: ${{ env.cp_tar }}
+          MODEL: ${{ matrix.model }}
+          CSC: ${{ matrix.csc }}
           LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
           LATEST_CSCVERSION: ${{ env.latest_cscversion }}
-          LATEST_MODEMVERSION: ${{ env.latest_modemversion }}
         run: |
           ./scripts/check.sh
 
