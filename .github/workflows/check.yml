@@ -165,18 +165,6 @@ jobs:
         run: |
           ./scripts/get_path.sh
 
-      - name: Check downloaded firmware version
-        if: env.update == 1
-        env:
-          AP_TAR: ${{ env.ap_tar }}
-          CSC_TAR: ${{ env.csc_tar }}
-          MODEL: ${{ matrix.model }}
-          CSC: ${{ matrix.csc }}
-          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
-          LATEST_CSCVERSION: ${{ env.latest_cscversion }}
-        run: |
-          ./scripts/check.sh
-
       - name: Cleanup space
         if: env.update == 1
         run: |
@@ -262,6 +250,19 @@ jobs:
           OMC: ${{ matrix.omc }}
         run: |
           ./scripts/fs_config.sh
+
+      - name: Generate versions.txt
+        if: env.update == 1
+        env:
+          AP_TAR: ${{ env.ap_tar }}
+          BL_LOCK: ${{ env.bl_lock }}
+          CSC_TAR: ${{ env.csc_tar }}
+          MODEL: ${{ matrix.model }}
+          CSC: ${{ matrix.csc }}
+          LATEST_SHORTVERSION: ${{ env.latest_shortversion }}
+          LATEST_CSCVERSION: ${{ env.latest_cscversion }}
+        run: |
+          ./scripts/versions.sh
 
       - name: Update current version
         if: env.update == 1

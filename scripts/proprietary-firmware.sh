@@ -10,7 +10,7 @@ done
 
 BL_LOCK="False"
 strings "sboot.bin_${MODEL}" | grep -q androidboot.other && BL_LOCK="True"
-echo "Bootloader Lock: $BL_LOCK" >> ../versions.txt
+echo "bl_lock=$BL_LOCK" >> "$GITHUB_ENV"
 
 rm -f "vbmeta.img"*
 
